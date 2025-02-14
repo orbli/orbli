@@ -1,0 +1,78 @@
+baseURL = 'https://orbb.li/'
+languageCode = 'en-us'
+title = 'Orb Li'
+theme = 'hugo-coder'
+defaultContentLanguage = "en"
+
+[pagination]
+pagerSize = 6
+enableEmoji = true
+
+[markup]
+[markup.highlight]
+noClasses = false
+
+[markup.goldmark]
+[markup.goldmark.renderer]
+unsafe = true
+
+[params]
+author = "Orb Li"
+description = "Orb Li's personal website"
+keywords = "blog,developer,personal"
+info = ["Software Engineer", "Amateur Musician"]
+gravatar = "mail@orbb.li"
+dateFormat = "January 2, 2006"
+since = 2014
+colorScheme = "dark"
+hideColorSchemeToggle = false
+maxSeeAlsoItems = 5
+commit = "https://github.com/luizdepra/hugo-coder/tree/"
+
+customCSS = []
+customSCSS = []
+customJS = []
+customRemoteJS = []
+
+[[params.social]]
+name = "Github"
+icon = "fa-brands fa-github fa-2x"
+weight = 1
+url = "https://github.com/orbli/"
+
+[[params.social]]
+name = "LinkedIn"
+icon = "fa-brands fa-linkedin fa-2x"
+weight = 4
+url = "https://www.linkedin.com/in/orbbital-li-765a3794/"
+
+[[params.social]]
+name = "facebook"
+icon = "fa-brands fa-facebook fa-2x"
+weight = 5
+url = "https://www.facebook.com/orbbli/"
+
+[[params.social]]
+name = "email"
+icon = "fa fa-envelope fa-2x"
+weight = 6
+url = "mailto: mail@orbb.li"
+
+[languages.en]
+languageName = ":uk:"
+
+[[languages.en.menu.main]]
+name = "Resume"
+weight = 1
+url = "about/"
+
+[[languages.en.menu.main]]
+name = "Blog"
+weight = 2
+url = "blog/"
+
+[[languages.en.menu.main]]
+name = "Projects"
+weight = 3
+url = "projects/"
+
