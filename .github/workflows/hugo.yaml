@@ -32,7 +32,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.141.0
+      HUGO_VERSION: 0.143.1
     steps:
       - name: Install Hugo CLI
         run: |
@@ -60,6 +60,9 @@ jobs:
             --gc \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
+      - name: Set CNAME
+        run: |
+          echo 'orbb.li' > ./public/CNAME
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
