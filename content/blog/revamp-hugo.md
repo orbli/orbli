@@ -1,6 +1,5 @@
 +++
 date = '2025-02-14'
-draft = true
 title = 'Revamp to Hugo'
 +++
 

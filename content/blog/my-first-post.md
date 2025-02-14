@@ -1,6 +1,5 @@
 +++
 date = '2022-04-23'
-draft = true
 title = 'First blog post'
 +++
 
