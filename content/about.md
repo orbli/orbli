@@ -12,8 +12,6 @@ Tenor: 2023 Feb - Now
 - Monitor portfolio and implements alpha guidance
 - Develop _Java_ / _Python_ tools for _trading_, _gateway_, _post-trade_ analysis & _backtest_ tools
 
-
-
 ## Software Engineer, Quantamental Tech Limited / Onebit Quant
 
 Tenor: 2020 Jul - 2022 Feb
@@ -21,7 +19,7 @@ Tenor: 2020 Jul - 2022 Feb
 - Added many _crypto_ exchanges connectivity, plus support to _derivatives_
 - Added realtime (_mbp/mbo_) orderbook data supportivity
 - Provide 24/7 support on opearating the _gateway_ system
-- Deploy system in _kubernetes_
+- Deploy system in _docker_
 - Provide support scripts in _python_
 
 ## Co-Founder, Director, PriSec
