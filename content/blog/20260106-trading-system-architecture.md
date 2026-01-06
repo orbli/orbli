@@ -29,6 +29,7 @@ This post distills the key architectural patterns I've learned into a coherent f
 10. [Adaptive Risk Systems](#adaptive-risk-systems)
 11. [Putting It All Together](#putting-it-all-together)
 12. [The Human Analogy: Roles on a Trading Desk](#the-human-analogy-roles-on-a-trading-desk)
+13. [Deep Dive: Portfolio Manager Expertise](#deep-dive-portfolio-manager-expertise)
 
 ---
 
@@ -788,6 +789,170 @@ The human org structure evolved to solve the same problem as good software archi
 When roles blur in human organizations—PM overrides risk, trader picks stocks—things go wrong. The same applies to software: when L1 has alpha views or L2 specifies execution details, the system becomes fragile.
 
 The cleanest trading operations have the same separation in both people AND code. This architecture isn't just software engineering—it's encoding decades of institutional wisdom about how to run a trading operation without blowing up.
+
+---
+
+## Deep Dive: Portfolio Manager Expertise
+
+Since PMs sit at **L2 (Signal Generation)**, their expertise centers on "what should we do" — generating alpha and constructing portfolios.
+
+### PM Expertise Domains
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        PM EXPERTISE DOMAINS                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   CORE (Must Have)              ADJACENT (Should Know)     NOT THEIR JOB    │
+│   ─────────────────             ────────────────────────   ──────────────   │
+│   • Alpha generation            • Risk metrics             • Algo tuning    │
+│   • Investment thesis           • Execution costs          • API specs      │
+│   • Position sizing             • Market microstructure    • Infra/DevOps   │
+│   • Portfolio construction      • Regulatory constraints   • Reconciliation │
+│   • Market knowledge            • Basic coding/quant       • Limit setting  │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1. Alpha Generation (The Core Job)
+
+| Skill | What It Means | Example |
+|-------|---------------|---------|
+| **Idea generation** | Finding profitable opportunities | "China's reopening will boost copper demand" |
+| **Research methodology** | Systematic approach to validating ideas | Fundamental analysis, factor models, data analysis |
+| **Information synthesis** | Combining multiple signals | Macro + technicals + sentiment → conviction |
+| **Differentiated view** | Knowing WHY you have edge | "Market underestimates duration of cycle" |
+
+### 2. Position Sizing & Portfolio Construction
+
+```python
+# PM thinks in these terms:
+class PMDecisionFramework:
+
+    def size_position(self, idea):
+        """How much to bet given conviction and risk budget"""
+
+        # Conviction: How confident am I?
+        conviction = self.assess_conviction(idea)  # 0-1
+
+        # Capacity: How much can I trade without moving market?
+        capacity = self.estimate_capacity(idea.instrument)
+
+        # Risk budget: How much risk can this idea consume?
+        risk_budget = self.portfolio.available_risk * conviction
+
+        # Correlation: Does this diversify or concentrate?
+        marginal_risk = self.portfolio.marginal_var(idea)
+
+        return min(
+            conviction * self.max_position,
+            capacity,
+            risk_budget / marginal_risk
+        )
+
+    def construct_portfolio(self, ideas):
+        """Combine ideas into coherent portfolio"""
+
+        # Not just picking winners - managing interactions
+        return optimize(
+            ideas,
+            constraints=[
+                sector_limits,
+                factor_exposures,
+                liquidity_requirements,
+                correlation_bounds
+            ]
+        )
+```
+
+### 3. Market Knowledge (Domain Expertise)
+
+Depends on strategy type:
+
+| Strategy | PM Expertise Focus |
+|----------|-------------------|
+| **Macro** | Central bank policy, FX dynamics, rates, global flows |
+| **Equity L/S** | Sector dynamics, company fundamentals, earnings |
+| **Quant** | Factor research, statistical methods, data sources |
+| **Credit** | Default risk, spreads, covenant analysis |
+| **Crypto** | Protocol economics, on-chain data, DeFi mechanics |
+
+### 4. Risk Understanding (Not Risk Management!)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  PM's Risk Role vs Risk Manager's Role                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  PM UNDERSTANDS:                    RISK MANAGER SETS:          │
+│  ───────────────                    ────────────────            │
+│  • How my positions contribute      • What the limits ARE       │
+│    to portfolio risk                                            │
+│  • Factor exposures I'm taking      • When to force liquidation │
+│  • Tail risks of my thesis          • Firm-wide constraints     │
+│  • Correlation assumptions          • Regulatory requirements   │
+│                                                                 │
+│  PM asks: "Is this risk worth it?"  RM asks: "Is this allowed?" │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 5. The Investment Memo
+
+A good PM can clearly articulate:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  THE INVESTMENT MEMO (What a PM should articulate)              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. THESIS: What is the trade and why?                          │
+│     "Long copper: supply constrained, China demand recovering"  │
+│                                                                 │
+│  2. EDGE: Why will we be right when others are wrong?           │
+│     "Market pricing 2% demand growth, we model 5%"              │
+│                                                                 │
+│  3. SIZING: Why this size?                                      │
+│     "2% of NAV, 0.3 Sharpe contribution, uncorrelated to book"  │
+│                                                                 │
+│  4. CATALYST: What will make it work and when?                  │
+│     "Q2 China PMI data, 3-6 month horizon"                      │
+│                                                                 │
+│  5. RISK: What could go wrong?                                  │
+│     "Global recession kills demand, stop out at -50bps"         │
+│                                                                 │
+│  6. EXECUTION: Any special requirements?                        │
+│     "Spread over 3 days, use LME not COMEX"                     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 6. Adjacent Skills (Should Know, Not Master)
+
+| Skill | Why It Matters | Depth Needed |
+|-------|---------------|--------------|
+| **Execution costs** | Affects net returns | Know impact, not algo details |
+| **Basic coding** | Data analysis, backtesting | Python/R proficiency, not production code |
+| **Risk metrics** | Communicate with risk team | VaR, Sharpe, drawdown concepts |
+| **Market microstructure** | Know when urgency matters | Liquidity patterns, not order book mechanics |
+
+### What a PM Does NOT Need
+
+- ❌ Deep execution expertise → That's the Trader (L3)
+- ❌ Exchange API knowledge → That's Market Access (L4)
+- ❌ Setting risk limits → That's Risk Manager (L1)
+- ❌ Reconciliation/Operations → That's Middle Office (OMS/PMS)
+
+### PM Archetypes by Strategy
+
+| Type | Primary Skill | Secondary Skill | Tools |
+|------|--------------|-----------------|-------|
+| **Discretionary Macro** | Market intuition, thesis | Communication | Bloomberg, research |
+| **Fundamental Equity** | Company analysis | Valuation modeling | Excel, FactSet |
+| **Systematic Quant** | Research methodology | Coding, statistics | Python, backtester |
+| **Multi-Asset** | Portfolio construction | Cross-asset knowledge | Optimizer, risk system |
+
+**The PM's unique value:** PMs are paid for *judgment* — knowing when the model is wrong, when to override signals, when conviction should increase despite drawdown. Technical skills are table stakes; differentiated insight is the edge.
 
 ---
 
