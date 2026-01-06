@@ -28,6 +28,7 @@ This post distills the key architectural patterns I've learned into a coherent f
 9. [Continuous Signals and Position Sizing](#continuous-signals-and-position-sizing)
 10. [Adaptive Risk Systems](#adaptive-risk-systems)
 11. [Putting It All Together](#putting-it-all-together)
+12. [The Human Analogy: Roles on a Trading Desk](#the-human-analogy-roles-on-a-trading-desk)
 
 ---
 
@@ -724,6 +725,69 @@ Here's how all the pieces fit:
 7. **Backtest at the right fidelity.** Level 1 for screening, Level 2 for development, Level 3 for validation.
 
 8. **Build incrementally.** Stub the HFT risk tier; implement when needed.
+
+---
+
+## The Human Analogy: Roles on a Trading Desk
+
+The architecture directly mirrors how trading desks organize human roles:
+
+```
+┌───────────────────────┬────────────────────────┬─────────────────────────┐
+│  SYSTEM LAYER         │  HUMAN ROLE            │  RESPONSIBILITY         │
+├───────────────────────┼────────────────────────┼─────────────────────────┤
+│  L1: Risk Management  │  Risk Manager          │  "You can't do that"    │
+│                       │                        │  Sets limits, no alpha  │
+│                       │                        │  views, just safety     │
+├───────────────────────┼────────────────────────┼─────────────────────────┤
+│  L2: Signal Generation│  Researcher / Analyst  │  "We should do this"    │
+│                       │  Portfolio Manager     │  Investment thesis,     │
+│                       │                        │  alpha ideas, sizing    │
+├───────────────────────┼────────────────────────┼─────────────────────────┤
+│  L3: Order Management │  Trader                │  "I'll work the order"  │
+│                       │  Execution Desk        │  HOW to execute, algo   │
+│                       │                        │  selection, timing      │
+├───────────────────────┼────────────────────────┼─────────────────────────┤
+│  L4: Market Access    │  Prime Broker / DMA    │  Connectivity to        │
+│                       │  Infrastructure        │  exchanges              │
+├───────────────────────┼────────────────────────┼─────────────────────────┤
+│  OMS / PMS            │  Middle & Back Office  │  Bookkeeping, P&L,      │
+│                       │  Operations            │  reconciliation         │
+└───────────────────────┴────────────────────────┴─────────────────────────┘
+```
+
+### Why the Parallel Exists
+
+The human org structure evolved to solve the same problem as good software architecture: **separation of concerns and clear accountability**.
+
+| Principle | Human Organization | Software Architecture |
+|-----------|-------------------|----------------------|
+| **No conflicts of interest** | Risk manager doesn't get paid on P&L | L1 has no alpha views |
+| **Specialized expertise** | Traders know market microstructure | L3 handles execution algos |
+| **Clear handoffs** | PM says "buy 10k shares", trader decides how | Signal → Order separation |
+| **Audit trail** | Operations tracks everything | OMS/PMS logging |
+
+### Real Workflow Example
+
+**Human version:**
+1. **Analyst** researches and says: "AAPL is undervalued, we should be 5% long"
+2. **PM** agrees, sizes it: "Let's do 3% given current exposure"
+3. **Risk Manager** checks: "That's within limits, approved"
+4. **Trader** executes: "I'll TWAP it over 2 hours to minimize impact"
+5. **Operations** reconciles: "Filled 100k shares @ $182.34 avg"
+
+**System version:**
+1. **L2 (Alpha)** generates signal: `{instrument: AAPL, direction: BUY, target: 0.03}`
+2. **L1 (Risk)** checks: `projected_position < max_single_position ✓`
+3. **L3 (Execution)** routes: `TWAP(duration=2h, slices=24)`
+4. **L4 (MA)** sends orders to exchange
+5. **OMS/PMS** tracks fills and updates P&L
+
+### Why This Matters
+
+When roles blur in human organizations—PM overrides risk, trader picks stocks—things go wrong. The same applies to software: when L1 has alpha views or L2 specifies execution details, the system becomes fragile.
+
+The cleanest trading operations have the same separation in both people AND code. This architecture isn't just software engineering—it's encoding decades of institutional wisdom about how to run a trading operation without blowing up.
 
 ---
 
