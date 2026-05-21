@@ -1,16 +1,30 @@
 {{- /*
   Project override of hugo-coder's _default/single.html.
-  Identical to the theme template (renders via partials/page.html), with an
-  extra call to partials/posts/remark42.html for blog-section pages only.
+  Inlines the theme's partials/page.html so the comments widget can be nested
+  inside the same <section class="container"> as the article. .content is
+  display:flex in the theme's _content.scss; emitting comments as a separate
+  flex child puts them to the RIGHT of the article instead of below.
   Keep in sync if the hugo-coder submodule is bumped.
 */ -}}
 {{ define "title" }}
   {{ .Title }} · {{ .Site.Title }}
 {{ end }}
 {{ define "content" }}
-  {{ partial "page.html" . }}
+  <section class="container page">
+    <article>
+      <header>
+        <h1 class="title">
+          <a class="title-link" href="{{ .Permalink | safeURL }}">
+            {{ .Title }}
+          </a>
+        </h1>
+      </header>
+
+      {{ .Content }}
+    </article>
+    {{ if eq .Section "blog" }}
+      {{ partial "posts/remark42.html" . }}
+    {{ end }}
+  </section>
   {{ partial "posts/math.html" . }}
-  {{ if eq .Section "blog" }}
-    {{ partial "posts/remark42.html" . }}
-  {{ end }}
 {{ end }}
