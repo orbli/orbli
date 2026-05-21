@@ -34,6 +34,10 @@ customSCSS = []
 customJS = []
 customRemoteJS = []
 
+[params.remark42]
+url = "https://remark42-lab.orbb.li"
+siteId = "orbli"
+
 [[params.social]]
 name = "facebook"
 icon = "fa-brands fa-facebook fa-2x"

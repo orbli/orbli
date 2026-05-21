@@ -1,0 +1,16 @@
+{{- /*
+  Project override of hugo-coder's _default/single.html.
+  Identical to the theme template (renders via partials/page.html), with an
+  extra call to partials/posts/remark42.html for blog-section pages only.
+  Keep in sync if the hugo-coder submodule is bumped.
+*/ -}}
+{{ define "title" }}
+  {{ .Title }} · {{ .Site.Title }}
+{{ end }}
+{{ define "content" }}
+  {{ partial "page.html" . }}
+  {{ partial "posts/math.html" . }}
+  {{ if eq .Section "blog" }}
+    {{ partial "posts/remark42.html" . }}
+  {{ end }}
+{{ end }}

@@ -1,0 +1,35 @@
+{{- /*
+  Remark42 comment widget.
+  Activated when site params.remark42.url is set.
+  Skipped per-post when front matter sets `disableComments: true`.
+*/ -}}
+{{- if isset .Site.Params "remark42" -}}
+{{- if and (isset .Site.Params.remark42 "url") (ne .Site.Params.remark42.url "") (eq (.Params.disableComments | default false) false) -}}
+{{- $host := .Site.Params.remark42.url -}}
+{{- $siteId := .Site.Params.remark42.siteId | default "orbli" -}}
+{{- $theme := .Site.Params.colorScheme | default "dark" -}}
+<div class="comments">
+  <div id="remark42"></div>
+  <script>
+    var remark_config = {
+      host: {{ $host | jsonify | safeJS }},
+      site_id: {{ $siteId | jsonify | safeJS }},
+      components: ["embed"],
+      url: window.location.origin + window.location.pathname,
+      max_shown_comments: 25,
+      theme: (window.localStorage && window.localStorage.getItem("colorscheme"))
+        || {{ $theme | jsonify | safeJS }}
+    };
+
+    (function(c) {
+      for (var i = 0; i < c.length; i++) {
+        var d = document, s = d.createElement('script');
+        s.src = remark_config.host + '/web/' + c[i] + '.js';
+        s.defer = true;
+        (d.head || d.body).appendChild(s);
+      }
+    })(remark_config.components);
+  </script>
+</div>
+{{- end -}}
+{{- end -}}
