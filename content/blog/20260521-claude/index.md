@@ -53,7 +53,7 @@ Instance plan 揀最平就得, network type我建議dual stack, 好似ipv6有時
 
 好了，有左個私家server就可以擺埋一邊了，一陣會再返黎
 
-2. 用tailscale；tailscale好似personal plan最多六個人用，不過我地一個都夠。去 https://login.tailscale.com/ ，我自己就用google account，禁幾個制就會入去呢版：
+2. 用tailscale；tailscale好似personal plan (free) 最多六個人用，不過我地一個都夠。去 https://login.tailscale.com/ ，我自己就用google account，禁幾個制就會入去呢版：
 
 ![tailscale mainpage](tailscale1.png)
 
