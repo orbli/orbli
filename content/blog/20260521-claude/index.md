@@ -67,7 +67,7 @@ Click "Add device" -> "Linux server"
 
 將下面段野直接copy入去頭先server果度:
 
-![tailscale install at server](tailscale4).png)
+![tailscale install at server](tailscale4.png)
 
 然後入呢段:
 
