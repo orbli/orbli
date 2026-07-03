@@ -13,7 +13,6 @@
   --ip-mono:ui-monospace,"Cascadia Code","JetBrains Mono",SFMono-Regular,Menlo,Consolas,monospace;
   font-size:16px; line-height:1.55; text-align:left; margin-top:8px;
 }
-/* neutralize the theme's article heading/paragraph styling inside the dashboard */
 #infra-page h2, #infra-page p{margin:0;padding:0;border:0}
 body.colorscheme-light #infra-page{
   --ip-accent:#0f8f81; --ip-ink:#0d1926; --ip-dim:#3f5567; --ip-faint:#748899;
@@ -32,8 +31,9 @@ body.colorscheme-light #infra-page{
 #infra-page .ip-updated{font-family:var(--ip-mono);font-size:13px;color:var(--ip-faint);
   display:flex;align-items:center;gap:8px}
 #infra-page .ip-dot{width:9px;height:9px;border-radius:50%;background:var(--ip-faint)}
-#infra-page .ip-dot.on{background:var(--ip-ok)}
+#infra-page .ip-dot.on{background:var(--ip-ok);box-shadow:0 0 0 0 color-mix(in srgb,var(--ip-ok) 60%,transparent);animation:ippulse 2.4s ease-out infinite}
 #infra-page .ip-dot.off{background:var(--ip-crit)}
+@keyframes ippulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ip-ok) 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
 
 #infra-page .ip-h1{font-size:clamp(28px,4.6vw,42px);line-height:1.1;margin:0;
   letter-spacing:-.02em;text-wrap:balance;max-width:20ch;border:0;padding:0;font-weight:700;color:var(--ip-ink)}
@@ -52,46 +52,63 @@ body.colorscheme-light #infra-page{
   border:1px solid var(--ip-line);color:var(--ip-dim);background:var(--ip-panel2)}
 #infra-page .ip-chip.on{color:var(--ip-accent);border-color:color-mix(in srgb,var(--ip-accent) 45%,var(--ip-line))}
 #infra-page .ip-flag-note{color:var(--ip-dim);font-size:15px;margin:14px 0 0;max-width:48ch}
-#infra-page .ip-flag-side{padding:26px 28px;display:grid;grid-template-columns:1fr 1fr;
-  gap:22px 26px;align-content:center}
-#infra-page .ip-k{font-family:var(--ip-mono);font-size:12px;letter-spacing:.05em;
-  text-transform:uppercase;color:var(--ip-faint)}
+#infra-page .ip-flag-side{padding:26px 28px;display:grid;grid-template-columns:1fr 1fr;gap:22px 26px;align-content:center}
+#infra-page .ip-k{font-family:var(--ip-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ip-faint)}
 #infra-page .ip-v{font-family:var(--ip-mono);font-size:24px;font-weight:600;line-height:1.2;margin-top:2px}
 #infra-page .ip-v small{font-size:14px;color:var(--ip-faint);font-weight:400}
-#infra-page .ip-gauge{height:7px;border-radius:100px;background:var(--ip-panel2);
-  border:1px solid var(--ip-line);overflow:hidden;margin-top:8px}
-#infra-page .ip-gauge>i{display:block;height:100%;background:var(--ip-accent)}
+#infra-page .ip-gauge{height:7px;border-radius:100px;background:var(--ip-panel2);border:1px solid var(--ip-line);overflow:hidden;margin-top:8px}
+#infra-page .ip-gauge>i{display:block;height:100%;background:var(--ip-accent);transition:width .6s ease}
 
 #infra-page .ip-sec{margin-top:46px}
 #infra-page .ip-sec-h{display:flex;align-items:baseline;gap:12px;margin:0 0 18px}
-#infra-page .ip-sec-h h2{font-family:var(--ip-mono);font-size:14px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--ip-dim);margin:0;border:0;padding:0;font-weight:600}
+#infra-page .ip-sec-h h2{font-family:var(--ip-mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--ip-dim);margin:0;border:0;padding:0;font-weight:600}
 #infra-page .ip-sec-h .ip-rule{flex:1;height:1px;background:var(--ip-line)}
 #infra-page .ip-sec-h .ip-count{font-family:var(--ip-mono);font-size:13px;color:var(--ip-faint)}
 
-#infra-page .ip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-#infra-page .ip-card{background:var(--ip-panel);border:1px solid var(--ip-line);border-radius:12px;
-  padding:18px 19px;position:relative;overflow:hidden}
+/* big panel (k3s, Sparks) */
+#infra-page .ip-panel{background:var(--ip-panel);border:1px solid var(--ip-line);border-radius:12px;
+  padding:18px 20px;position:relative;overflow:hidden;margin-bottom:14px}
+#infra-page .ip-panel::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--ip-stripe,var(--ip-ok))}
+#infra-page .ip-panel-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+#infra-page .ip-mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:15px 20px}
+#infra-page .ip-cell .ip-mk{font-family:var(--ip-mono);font-size:11px;color:var(--ip-faint);text-transform:uppercase;letter-spacing:.05em}
+#infra-page .ip-cell .ip-mv{font-family:var(--ip-mono);font-size:18px;font-weight:600;margin-top:3px;white-space:nowrap}
+
+/* gpu sub-blocks */
+#infra-page .ip-gpus{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:560px){#infra-page .ip-gpus{grid-template-columns:1fr}}
+#infra-page .ip-gpu{border:1px solid var(--ip-line);border-radius:10px;padding:14px 16px;background:var(--ip-panel2)}
+#infra-page .ip-gpu-top{display:flex;justify-content:space-between;align-items:baseline}
+#infra-page .ip-gpu-label{font-family:var(--ip-mono);font-size:12px;color:var(--ip-dim);letter-spacing:.05em}
+#infra-page .ip-gpu-temp{font-family:var(--ip-mono);font-size:26px;font-weight:600}
+#infra-page .ip-bar{height:6px;border-radius:100px;background:var(--ip-line);overflow:hidden;margin:10px 0 8px}
+#infra-page .ip-bar>i{display:block;height:100%;background:var(--ip-accent);transition:width .6s ease;min-width:2px}
+#infra-page .ip-gpu-sub{display:flex;justify-content:space-between;gap:8px;font-family:var(--ip-mono);font-size:12px;color:var(--ip-dim)}
+
+/* compact card (Nomad, QNAP) */
+#infra-page .ip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+#infra-page .ip-card{background:var(--ip-panel);border:1px solid var(--ip-line);border-radius:12px;padding:16px 17px;position:relative;overflow:hidden}
 #infra-page .ip-card::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--ip-stripe,var(--ip-faint))}
-#infra-page .ip-card.ok{--ip-stripe:var(--ip-ok)}
-#infra-page .ip-card.warn{--ip-stripe:var(--ip-warn)}
-#infra-page .ip-card.crit{--ip-stripe:var(--ip-crit)}
+#infra-page .ip-card.ok{--ip-stripe:var(--ip-ok)} #infra-page .ip-card.warn{--ip-stripe:var(--ip-warn)} #infra-page .ip-card.crit{--ip-stripe:var(--ip-crit)}
 #infra-page .ip-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
 #infra-page .ip-name{font-family:var(--ip-mono);font-weight:600;font-size:16px}
 #infra-page .ip-role{font-family:var(--ip-mono);font-size:12px;color:var(--ip-faint);margin-top:3px}
-#infra-page .ip-pill{font-family:var(--ip-mono);font-size:11px;padding:4px 9px;border-radius:100px;
-  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+#infra-page .ip-pill{font-family:var(--ip-mono);font-size:11px;padding:4px 9px;border-radius:100px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;align-self:flex-start}
 #infra-page .ip-pill.ok{color:var(--ip-ok);background:color-mix(in srgb,var(--ip-ok) 14%,transparent)}
 #infra-page .ip-pill.warn{color:var(--ip-warn);background:color-mix(in srgb,var(--ip-warn) 16%,transparent)}
-#infra-page .ip-metrics{display:flex;gap:20px;flex-wrap:wrap;margin-top:15px}
-#infra-page .ip-mk{font-family:var(--ip-mono);font-size:11px;color:var(--ip-faint);
-  text-transform:uppercase;letter-spacing:.05em}
+#infra-page .ip-metrics{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}
+#infra-page .ip-mk{font-family:var(--ip-mono);font-size:11px;color:var(--ip-faint);text-transform:uppercase;letter-spacing:.05em}
 #infra-page .ip-mv{font-family:var(--ip-mono);font-size:17px;font-weight:600;margin-top:2px}
-#infra-page .ip-cloud{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+
+#infra-page .ip-cloud{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
 #infra-page .ip-big{font-family:var(--ip-mono);font-size:28px;font-weight:600}
 #infra-page .ip-big small{font-size:14px;color:var(--ip-faint)}
-#infra-page .ip-note{margin-top:24px;font-family:var(--ip-mono);font-size:12px;color:var(--ip-faint);
-  border:1px dashed var(--ip-line);border-radius:8px;padding:11px 14px}
+#infra-page .ip-note{margin-top:24px;font-family:var(--ip-mono);font-size:12px;color:var(--ip-faint);border:1px dashed var(--ip-line);border-radius:8px;padding:11px 14px}
+
+/* flash a value when it changes (the live 'tick') */
+@keyframes ipflash{0%{color:var(--ip-accent)}70%{color:var(--ip-accent)}100%{}}
+#infra-page .ip-flash{animation:ipflash .9s ease}
+@media(prefers-reduced-motion:reduce){#infra-page .ip-flash{animation:none} #infra-page .ip-dot.on{animation:none}}
 </style>
 
 <section class="container page">
@@ -115,7 +132,7 @@ body.colorscheme-light #infra-page{
       <div class="ip-flag-main">
         <div class="ip-model" id="ip-model">—</div>
         <div class="ip-apis" id="ip-apis"></div>
-        <p class="ip-flag-note" id="ip-flag-note">Tensor-split across two GB10 nodes over a 200GbE link. Drives Claude Code as a local harness.</p>
+        <p class="ip-flag-note">Tensor-split across two GB10 nodes over a 200GbE link. Drives Claude Code as a local harness.</p>
       </div>
       <div class="ip-flag-side" id="ip-flag-side"></div>
     </div>
@@ -123,7 +140,8 @@ body.colorscheme-light #infra-page{
 
   <div class="ip-sec">
     <div class="ip-sec-h"><h2>Systems</h2><span class="ip-rule"></span><span class="ip-count" id="ip-nodes-count"></span></div>
-    <div class="ip-grid" id="ip-nodes"></div>
+    <div id="ip-bigs"></div>
+    <div class="ip-grid" id="ip-cards"></div>
   </div>
   <div class="ip-sec">
     <div class="ip-sec-h"><h2>Platform</h2><span class="ip-rule"></span><span class="ip-count" id="ip-platform-count"></span></div>
@@ -134,7 +152,7 @@ body.colorscheme-light #infra-page{
     <div class="ip-cloud" id="ip-cloud"></div>
   </div>
 
-  <div class="ip-note" id="ip-note">Live snapshot, sanitized — no addresses or internal hostnames. Served outbound-only through a Cloudflare tunnel.</div>
+  <div class="ip-note" id="ip-note">Live stream, sanitized — no addresses or internal hostnames. Served outbound-only through a Cloudflare tunnel.</div>
   </div>
  </article>
 </section>
@@ -142,58 +160,89 @@ body.colorscheme-light #infra-page{
 <script>
 (function(){
   var SRC = "{{ $src }}";
+  var SSE = SRC.replace(/\/infra\.json$/, "/events");
   var $=function(id){return document.getElementById(id)};
   function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
-  function metricsHTML(ms){return '<div class="ip-metrics">'+(ms||[]).map(function(m){
-    return '<div><div class="ip-mk">'+esc(m[0])+'</div><div class="ip-mv tnum">'+esc(m[1])+'</div></div>';}).join('')+'</div>'}
+
+  // flash tracking: returns a class suffix when a keyed value changes
+  var PREV={};
+  function fc(key,v){var s=String(v);var c=(PREV[key]!==undefined&&PREV[key]!==s)?" ip-flash":"";PREV[key]=s;return c}
+
+  function mgrid(name,ms){return '<div class="ip-mgrid">'+(ms||[]).map(function(m){
+    return '<div class="ip-cell"><div class="ip-mk">'+esc(m[0])+'</div>'+
+      '<div class="ip-cell-v ip-mv tnum'+fc(name+'|'+m[0],m[1])+'">'+esc(m[1])+'</div></div>';}).join('')+'</div>'}
+
+  function panel(n){
+    var stripe=n.status==='warn'?'var(--ip-warn)':n.status==='crit'?'var(--ip-crit)':'var(--ip-ok)';
+    var h='<div class="ip-panel" style="--ip-stripe:'+stripe+'"><div class="ip-panel-top"><div>'+
+      '<div class="ip-name">'+esc(n.name)+'</div><div class="ip-role">'+esc(n.role||'')+'</div></div>'+
+      '<span class="ip-pill '+esc(n.status||'ok')+'">'+esc(n.pill||'')+'</span></div>';
+    if(n.gpus&&n.gpus.length){
+      h+='<div class="ip-gpus">'+n.gpus.map(function(g){var k='g'+g.label;
+        return '<div class="ip-gpu"><div class="ip-gpu-top"><span class="ip-gpu-label">GPU '+esc(g.label)+'</span>'+
+          '<span class="ip-gpu-temp tnum'+fc(k+'t',g.temp)+'">'+g.temp+'°C</span></div>'+
+          '<div class="ip-bar"><i style="width:'+Math.max(2,g.util)+'%"></i></div>'+
+          '<div class="ip-gpu-sub"><span class="tnum'+fc(k+'u',g.util)+'">util '+g.util+'%</span>'+
+          '<span class="tnum'+fc(k+'m',g.mhz)+'">'+g.mhz+' MHz</span>'+
+          '<span class="tnum'+fc(k+'p',g.power)+'">'+g.power+' W</span></div></div>';}).join('')+'</div>';
+    }
+    return h+mgrid(n.name,n.metrics)+'</div>';
+  }
+
   function card(n){return '<div class="ip-card '+esc(n.status||'ok')+'"><div class="ip-card-top"><div>'+
     '<div class="ip-name">'+esc(n.name)+'</div><div class="ip-role">'+esc(n.role||'')+'</div></div>'+
-    '<span class="ip-pill '+esc(n.status||'ok')+'">'+esc(n.pill||'')+'</span></div>'+metricsHTML(n.metrics)+'</div>'}
+    '<span class="ip-pill '+esc(n.status||'ok')+'">'+esc(n.pill||'')+'</span></div>'+
+    '<div class="ip-metrics">'+(n.metrics||[]).map(function(m){
+      return '<div><div class="ip-mk">'+esc(m[0])+'</div><div class="ip-mv tnum'+fc(n.name+'|'+m[0],m[1])+'">'+esc(m[1])+'</div></div>';}).join('')+'</div></div>'}
 
-  function agoText(iso){
-    if(!iso) return "no data";
-    var s=Math.max(0,Math.floor((Date.now()-Date.parse(iso))/1000));
-    return s<90? s+"s ago" : Math.floor(s/60)+"m ago";
-  }
+  function agoText(iso){if(!iso)return"no data";var s=Math.max(0,Math.floor((Date.now()-Date.parse(iso))/1000));return s<90?s+"s ago":Math.floor(s/60)+"m ago"}
   var lastGen=null;
+  function tick(){$("ip-ago").textContent=agoText(lastGen)}
 
   function render(d){
-    lastGen=d.generated;
-    $("ip-dot").className="ip-dot on"; tick();
+    lastGen=d.generated; $("ip-dot").className="ip-dot on"; tick();
     var c=d.compute||{};
-    if(c.model){
-      $("ip-model").textContent=c.model;
-      if(c.params_b) $("ip-headline").innerHTML='A <em>'+Math.round(c.params_b)+'-billion-parameter</em> model, running under my desk.';
-    }
+    if(c.model){$("ip-model").textContent=c.model;
+      if(c.params_b)$("ip-headline").innerHTML='A <em>'+Math.round(c.params_b)+'-billion-parameter</em> model, running under my desk.';}
     $("ip-apis").innerHTML=(c.apis||[]).map(function(a){return '<span class="ip-chip on">'+esc(a)+'-compatible</span>'}).join('')+
-      (c.ctx? '<span class="ip-chip">'+Math.round(c.ctx/1024)+'k context</span>':'');
+      (c.ctx?'<span class="ip-chip">'+Math.round(c.ctx/1024)+'k context</span>':'');
     var side=[];
-    side.push(['Params', c.params_b? c.params_b+' <small>B</small>':'—']);
-    side.push(['Throughput', c.tok_s!=null? c.tok_s+' <small>tok/s</small>':'<small>awaiting restart</small>']);
-    if(c.kv_cache_pct!=null) side.push(['KV cache', c.kv_cache_pct+' <small>%</small>']);
-    side.push(['Status', c.up? '<span style="color:var(--ip-ok)">online</span>':'<span style="color:var(--ip-crit)">offline</span>']);
-    var sideHTML=side.map(function(s){return '<div><div class="ip-k">'+s[0]+'</div><div class="ip-v tnum">'+s[1]+'</div></div>'}).join('');
-    if(c.vram_gb) sideHTML+='<div style="grid-column:1/-1"><div class="ip-k">VRAM pool</div>'+
-      '<div class="ip-v tnum">'+c.vram_gb+' <small>/ 218 GB</small></div>'+
-      '<div class="ip-gauge"><i style="width:'+Math.min(100,Math.round(c.vram_gb/218*100))+'%"></i></div></div>';
-    $("ip-flag-side").innerHTML=sideHTML;
+    side.push(['Params',c.params_b?c.params_b+' <small>B</small>':'—']);
+    side.push(['Throughput',c.tok_s!=null?'<span class="'+fc('tok',c.tok_s)+'">'+c.tok_s+' <small>tok/s</small></span>':'<small>awaiting restart</small>']);
+    if(c.kv_cache_pct!=null)side.push(['KV cache',c.kv_cache_pct+' <small>%</small>']);
+    side.push(['Status',c.up?'<span style="color:var(--ip-ok)">online</span>':'<span style="color:var(--ip-crit)">offline</span>']);
+    var sh=side.map(function(s){return '<div><div class="ip-k">'+s[0]+'</div><div class="ip-v tnum">'+s[1]+'</div></div>'}).join('');
+    if(c.vram_gb)sh+='<div style="grid-column:1/-1"><div class="ip-k">VRAM pool</div><div class="ip-v tnum">'+c.vram_gb+
+      ' <small>/ 218 GB</small></div><div class="ip-gauge"><i style="width:'+Math.min(100,Math.round(c.vram_gb/218*100))+'%"></i></div></div>';
+    $("ip-flag-side").innerHTML=sh;
 
-    $("ip-nodes").innerHTML=(d.nodes||[]).map(card).join('');
+    var nodes=d.nodes||[], bigs=[], cards=[];
+    nodes.forEach(function(n){(n.kind==='big'?bigs:cards).push(n)});
+    $("ip-bigs").innerHTML=bigs.map(panel).join('');
+    $("ip-cards").innerHTML=cards.map(card).join('');
+    $("ip-nodes-count").textContent=nodes.length+" tracked";
     $("ip-platform").innerHTML=(d.platform||[]).map(card).join('');
-    $("ip-nodes-count").textContent=(d.nodes||[]).length+" tracked";
     $("ip-platform-count").textContent=(d.platform||[]).length+" services";
     $("ip-cloud").innerHTML=(d.cloud||[]).map(function(x){return '<div class="ip-card '+esc(x.st||'ok')+'">'+
       '<div class="ip-role">'+esc(x.name)+'</div><div class="ip-big tnum">'+esc(x.big)+' <small>'+esc(x.unit)+'</small></div>'+
       '<div class="ip-role" style="margin-top:3px">'+esc(x.sub||'')+'</div></div>'}).join('');
   }
-  function offline(){$("ip-dot").className="ip-dot off";$("ip-ago").textContent="offline";
-    $("ip-note").textContent="Status endpoint unreachable — the snapshot service may be starting up. Retrying…";}
-  function tick(){$("ip-ago").textContent=agoText(lastGen)}
+  function offline(){$("ip-dot").className="ip-dot off";$("ip-ago").textContent="offline";}
 
-  function load(){
-    fetch(SRC,{cache:"no-store"}).then(function(r){return r.json()}).then(render).catch(offline);
+  // Prefer SSE; fall back to polling /infra.json if the stream errors.
+  var es=null, pollTimer=null;
+  function startPoll(){if(pollTimer)return;
+    function p(){fetch(SRC,{cache:"no-store"}).then(function(r){return r.json()}).then(render).catch(offline)}
+    p(); pollTimer=setInterval(p,4000);}
+  function startSSE(){
+    try{
+      es=new EventSource(SSE);
+      es.onmessage=function(e){try{render(JSON.parse(e.data))}catch(_){}};
+      es.onerror=function(){/* EventSource auto-reconnects; poll as a safety net */ startPoll();};
+    }catch(_){startPoll();}
   }
-  load(); setInterval(load, 30000); setInterval(tick, 1000);
+  if(window.EventSource){startSSE();}else{startPoll();}
+  setInterval(tick,1000);
 })();
 </script>
 {{ end }}
