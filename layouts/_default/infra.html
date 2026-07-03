@@ -2,18 +2,19 @@
 {{ define "content" }}
 {{ $src := .Site.Params.infraStatusURL | default "https://infra-lab.orbb.li/infra.json" }}
 <style>
-/* Break out of hugo-coder's narrow reading column and center in the viewport.
-   Fonts are in px because the theme sets html{font-size:62.5%} (1rem=10px),
-   which would otherwise shrink every rem-based size to ~62%. */
+/* Lives inside the theme's .container.page (max-width 90rem + 2rem gutters), so
+   it inherits the same width/margins as every other page. Fonts are px because
+   the theme sets html{font-size:62.5%} (1rem=10px), which would otherwise shrink
+   rem-based sizes to ~62%. */
 #infra-page{
   --ip-accent:#35d0c0; --ip-ink:#e6edf3; --ip-dim:#9fb0c0; --ip-faint:#6b7d8f;
   --ip-panel:#111721; --ip-panel2:#0e141d; --ip-line:#1e2733;
   --ip-ok:#3fb950; --ip-warn:#d29922; --ip-crit:#f85149;
   --ip-mono:ui-monospace,"Cascadia Code","JetBrains Mono",SFMono-Regular,Menlo,Consolas,monospace;
-  position:relative; left:50%; transform:translateX(-50%);
-  width:min(94vw,1040px); box-sizing:border-box;
-  font-size:16px; line-height:1.55; text-align:left;
+  font-size:16px; line-height:1.55; text-align:left; margin-top:8px;
 }
+/* neutralize the theme's article heading/paragraph styling inside the dashboard */
+#infra-page h2, #infra-page p{margin:0;padding:0;border:0}
 body.colorscheme-light #infra-page{
   --ip-accent:#0f8f81; --ip-ink:#0d1926; --ip-dim:#3f5567; --ip-faint:#748899;
   --ip-panel:#ffffff; --ip-panel2:#eef2f6; --ip-line:#dce4ec;
@@ -24,21 +25,19 @@ body.colorscheme-light #infra-page{
 #infra-page .tnum{font-variant-numeric:tabular-nums}
 #infra-page a{color:var(--ip-accent)}
 
-#infra-page .ip-top{display:flex;justify-content:space-between;align-items:center;gap:14px;
-  flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--ip-line)}
-#infra-page .ip-brand{font-family:var(--ip-mono);font-size:15px;color:var(--ip-dim)}
-#infra-page .ip-brand b{color:var(--ip-ink)}
+#infra-page .ip-eyebrow-row{display:flex;justify-content:space-between;align-items:center;
+  gap:14px;flex-wrap:wrap;margin:6px 0 14px}
+#infra-page .ip-eyebrow{font-family:var(--ip-mono);font-size:12px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ip-accent)}
 #infra-page .ip-updated{font-family:var(--ip-mono);font-size:13px;color:var(--ip-faint);
   display:flex;align-items:center;gap:8px}
 #infra-page .ip-dot{width:9px;height:9px;border-radius:50%;background:var(--ip-faint)}
 #infra-page .ip-dot.on{background:var(--ip-ok)}
 #infra-page .ip-dot.off{background:var(--ip-crit)}
 
-#infra-page .ip-eyebrow{font-family:var(--ip-mono);font-size:12px;letter-spacing:.22em;
-  text-transform:uppercase;color:var(--ip-accent);margin:38px 0 14px}
-#infra-page h1.ip-h1{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:0;
-  letter-spacing:-.02em;text-wrap:balance;max-width:20ch;border:0;padding:0;font-weight:700}
-#infra-page h1.ip-h1 em{font-style:normal;color:var(--ip-accent)}
+#infra-page .ip-h1{font-size:clamp(28px,4.6vw,42px);line-height:1.1;margin:0;
+  letter-spacing:-.02em;text-wrap:balance;max-width:20ch;border:0;padding:0;font-weight:700;color:var(--ip-ink)}
+#infra-page .ip-h1 em{font-style:normal;color:var(--ip-accent)}
 #infra-page .ip-lede{color:var(--ip-dim);max-width:64ch;margin:18px 0 0;font-size:17px}
 
 #infra-page .ip-flag{margin-top:30px;border:1px solid var(--ip-line);border-radius:14px;
@@ -95,14 +94,17 @@ body.colorscheme-light #infra-page{
   border:1px dashed var(--ip-line);border-radius:8px;padding:11px 14px}
 </style>
 
-<div id="infra-page">
-  <div class="ip-top">
-    <div class="ip-brand"><b>orbb.li</b> / infra</div>
-    <div class="ip-updated"><span class="ip-dot" id="ip-dot"></span><span id="ip-ago">connecting…</span></div>
+<section class="container page">
+ <article>
+  <header>
+    <h1 class="title"><a class="title-link" href="{{ .Permalink | safeURL }}">{{ .Title }}</a></h1>
+  </header>
+  <div id="infra-page">
+  <div class="ip-eyebrow-row">
+    <span class="ip-eyebrow">Self-hosted compute</span>
+    <span class="ip-updated"><span class="ip-dot" id="ip-dot"></span><span id="ip-ago">connecting…</span></span>
   </div>
-
-  <p class="ip-eyebrow">Self-hosted compute</p>
-  <h1 class="ip-h1" id="ip-headline">A frontier LLM, running under my desk.</h1>
+  <h2 class="ip-h1" id="ip-headline">A frontier LLM, running under my desk.</h2>
   <p class="ip-lede">Everything below runs on hardware I own — a Raspberry-Pi Kubernetes cluster, a
     Nomad cluster, and two NVIDIA GB10 boxes pooling their memory to serve a large language model.
     GitOps-managed, watched by its own Grafana stack, published outbound-only so nothing here is reachable directly.</p>
@@ -132,7 +134,9 @@ body.colorscheme-light #infra-page{
   </div>
 
   <div class="ip-note" id="ip-note">Live snapshot, sanitized — no addresses or internal hostnames. Served outbound-only through a Cloudflare tunnel.</div>
-</div>
+  </div>
+ </article>
+</section>
 
 <script>
 (function(){
