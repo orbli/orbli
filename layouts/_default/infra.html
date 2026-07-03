@@ -2,90 +2,97 @@
 {{ define "content" }}
 {{ $src := .Site.Params.infraStatusURL | default "https://infra-lab.orbb.li/infra.json" }}
 <style>
+/* Break out of hugo-coder's narrow reading column and center in the viewport.
+   Fonts are in px because the theme sets html{font-size:62.5%} (1rem=10px),
+   which would otherwise shrink every rem-based size to ~62%. */
 #infra-page{
   --ip-accent:#35d0c0; --ip-ink:#e6edf3; --ip-dim:#9fb0c0; --ip-faint:#6b7d8f;
   --ip-panel:#111721; --ip-panel2:#0e141d; --ip-line:#1e2733;
   --ip-ok:#3fb950; --ip-warn:#d29922; --ip-crit:#f85149;
   --ip-mono:ui-monospace,"Cascadia Code","JetBrains Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  position:relative; left:50%; transform:translateX(-50%);
+  width:min(94vw,1040px); box-sizing:border-box;
+  font-size:16px; line-height:1.55; text-align:left;
 }
 body.colorscheme-light #infra-page{
   --ip-accent:#0f8f81; --ip-ink:#0d1926; --ip-dim:#3f5567; --ip-faint:#748899;
   --ip-panel:#ffffff; --ip-panel2:#eef2f6; --ip-line:#dce4ec;
   --ip-ok:#1a7f37; --ip-warn:#9a6700; --ip-crit:#cf222e;
 }
-#infra-page{color:var(--ip-ink);font-feature-settings:"tnum";line-height:1.5}
+#infra-page *{box-sizing:border-box}
 #infra-page .mono{font-family:var(--ip-mono)}
 #infra-page .tnum{font-variant-numeric:tabular-nums}
 #infra-page a{color:var(--ip-accent)}
 
 #infra-page .ip-top{display:flex;justify-content:space-between;align-items:center;gap:14px;
-  flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--ip-line)}
-#infra-page .ip-brand{font-family:var(--ip-mono);font-size:.85rem;color:var(--ip-dim)}
+  flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--ip-line)}
+#infra-page .ip-brand{font-family:var(--ip-mono);font-size:15px;color:var(--ip-dim)}
 #infra-page .ip-brand b{color:var(--ip-ink)}
-#infra-page .ip-updated{font-family:var(--ip-mono);font-size:.76rem;color:var(--ip-faint);
+#infra-page .ip-updated{font-family:var(--ip-mono);font-size:13px;color:var(--ip-faint);
   display:flex;align-items:center;gap:8px}
-#infra-page .ip-dot{width:8px;height:8px;border-radius:50%;background:var(--ip-faint)}
+#infra-page .ip-dot{width:9px;height:9px;border-radius:50%;background:var(--ip-faint)}
 #infra-page .ip-dot.on{background:var(--ip-ok)}
 #infra-page .ip-dot.off{background:var(--ip-crit)}
 
-#infra-page .ip-eyebrow{font-family:var(--ip-mono);font-size:.72rem;letter-spacing:.22em;
-  text-transform:uppercase;color:var(--ip-accent);margin:34px 0 12px}
-#infra-page h1.ip-h1{font-size:clamp(1.7rem,4.5vw,2.6rem);line-height:1.08;margin:0;
-  letter-spacing:-.02em;text-wrap:balance;max-width:18ch;border:0;padding:0}
+#infra-page .ip-eyebrow{font-family:var(--ip-mono);font-size:12px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ip-accent);margin:38px 0 14px}
+#infra-page h1.ip-h1{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:0;
+  letter-spacing:-.02em;text-wrap:balance;max-width:20ch;border:0;padding:0;font-weight:700}
 #infra-page h1.ip-h1 em{font-style:normal;color:var(--ip-accent)}
-#infra-page .ip-lede{color:var(--ip-dim);max-width:60ch;margin:16px 0 0}
+#infra-page .ip-lede{color:var(--ip-dim);max-width:64ch;margin:18px 0 0;font-size:17px}
 
-#infra-page .ip-flag{margin-top:26px;border:1px solid var(--ip-line);border-radius:14px;
+#infra-page .ip-flag{margin-top:30px;border:1px solid var(--ip-line);border-radius:14px;
   background:linear-gradient(180deg,var(--ip-panel),var(--ip-panel2));overflow:hidden}
-#infra-page .ip-flag-grid{display:grid;grid-template-columns:1.4fr 1fr}
-@media(max-width:640px){#infra-page .ip-flag-grid{grid-template-columns:1fr}}
-#infra-page .ip-flag-main{padding:22px 24px;border-right:1px solid var(--ip-line)}
-@media(max-width:640px){#infra-page .ip-flag-main{border-right:0;border-bottom:1px solid var(--ip-line)}}
-#infra-page .ip-model{font-family:var(--ip-mono);font-size:1.35rem;font-weight:600}
-#infra-page .ip-apis{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
-#infra-page .ip-chip{font-family:var(--ip-mono);font-size:.7rem;padding:4px 9px;border-radius:100px;
+#infra-page .ip-flag-grid{display:grid;grid-template-columns:1.5fr 1fr}
+@media(max-width:680px){#infra-page .ip-flag-grid{grid-template-columns:1fr}}
+#infra-page .ip-flag-main{padding:26px 28px;border-right:1px solid var(--ip-line)}
+@media(max-width:680px){#infra-page .ip-flag-main{border-right:0;border-bottom:1px solid var(--ip-line)}}
+#infra-page .ip-model{font-family:var(--ip-mono);font-size:26px;font-weight:600}
+#infra-page .ip-apis{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0 4px}
+#infra-page .ip-chip{font-family:var(--ip-mono);font-size:12px;padding:5px 11px;border-radius:100px;
   border:1px solid var(--ip-line);color:var(--ip-dim);background:var(--ip-panel2)}
 #infra-page .ip-chip.on{color:var(--ip-accent);border-color:color-mix(in srgb,var(--ip-accent) 45%,var(--ip-line))}
-#infra-page .ip-flag-note{color:var(--ip-dim);font-size:.9rem;margin:12px 0 0;max-width:46ch}
-#infra-page .ip-flag-side{padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:18px 22px;align-content:center}
-#infra-page .ip-k{font-family:var(--ip-mono);font-size:.68rem;letter-spacing:.05em;
+#infra-page .ip-flag-note{color:var(--ip-dim);font-size:15px;margin:14px 0 0;max-width:48ch}
+#infra-page .ip-flag-side{padding:26px 28px;display:grid;grid-template-columns:1fr 1fr;
+  gap:22px 26px;align-content:center}
+#infra-page .ip-k{font-family:var(--ip-mono);font-size:12px;letter-spacing:.05em;
   text-transform:uppercase;color:var(--ip-faint)}
-#infra-page .ip-v{font-family:var(--ip-mono);font-size:1.35rem;font-weight:600;line-height:1.2}
-#infra-page .ip-v small{font-size:.78rem;color:var(--ip-faint);font-weight:400}
-#infra-page .ip-gauge{height:6px;border-radius:100px;background:var(--ip-panel2);
-  border:1px solid var(--ip-line);overflow:hidden;margin-top:7px}
+#infra-page .ip-v{font-family:var(--ip-mono);font-size:24px;font-weight:600;line-height:1.2;margin-top:2px}
+#infra-page .ip-v small{font-size:14px;color:var(--ip-faint);font-weight:400}
+#infra-page .ip-gauge{height:7px;border-radius:100px;background:var(--ip-panel2);
+  border:1px solid var(--ip-line);overflow:hidden;margin-top:8px}
 #infra-page .ip-gauge>i{display:block;height:100%;background:var(--ip-accent)}
 
-#infra-page .ip-sec{margin-top:40px}
-#infra-page .ip-sec-h{display:flex;align-items:baseline;gap:12px;margin:0 0 16px}
-#infra-page .ip-sec-h h2{font-family:var(--ip-mono);font-size:.78rem;letter-spacing:.16em;
+#infra-page .ip-sec{margin-top:46px}
+#infra-page .ip-sec-h{display:flex;align-items:baseline;gap:12px;margin:0 0 18px}
+#infra-page .ip-sec-h h2{font-family:var(--ip-mono);font-size:14px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--ip-dim);margin:0;border:0;padding:0;font-weight:600}
 #infra-page .ip-sec-h .ip-rule{flex:1;height:1px;background:var(--ip-line)}
-#infra-page .ip-sec-h .ip-count{font-family:var(--ip-mono);font-size:.74rem;color:var(--ip-faint)}
+#infra-page .ip-sec-h .ip-count{font-family:var(--ip-mono);font-size:13px;color:var(--ip-faint)}
 
-#infra-page .ip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:13px}
-#infra-page .ip-card{background:var(--ip-panel);border:1px solid var(--ip-line);border-radius:10px;
-  padding:15px 16px;position:relative;overflow:hidden}
+#infra-page .ip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+#infra-page .ip-card{background:var(--ip-panel);border:1px solid var(--ip-line);border-radius:12px;
+  padding:18px 19px;position:relative;overflow:hidden}
 #infra-page .ip-card::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--ip-stripe,var(--ip-faint))}
 #infra-page .ip-card.ok{--ip-stripe:var(--ip-ok)}
 #infra-page .ip-card.warn{--ip-stripe:var(--ip-warn)}
 #infra-page .ip-card.crit{--ip-stripe:var(--ip-crit)}
 #infra-page .ip-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-#infra-page .ip-name{font-family:var(--ip-mono);font-weight:600;font-size:.94rem}
-#infra-page .ip-role{font-family:var(--ip-mono);font-size:.7rem;color:var(--ip-faint);margin-top:2px}
-#infra-page .ip-pill{font-family:var(--ip-mono);font-size:.66rem;padding:3px 8px;border-radius:100px;
+#infra-page .ip-name{font-family:var(--ip-mono);font-weight:600;font-size:16px}
+#infra-page .ip-role{font-family:var(--ip-mono);font-size:12px;color:var(--ip-faint);margin-top:3px}
+#infra-page .ip-pill{font-family:var(--ip-mono);font-size:11px;padding:4px 9px;border-radius:100px;
   text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
 #infra-page .ip-pill.ok{color:var(--ip-ok);background:color-mix(in srgb,var(--ip-ok) 14%,transparent)}
 #infra-page .ip-pill.warn{color:var(--ip-warn);background:color-mix(in srgb,var(--ip-warn) 16%,transparent)}
-#infra-page .ip-metrics{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
-#infra-page .ip-mk{font-family:var(--ip-mono);font-size:.66rem;color:var(--ip-faint);
+#infra-page .ip-metrics{display:flex;gap:20px;flex-wrap:wrap;margin-top:15px}
+#infra-page .ip-mk{font-family:var(--ip-mono);font-size:11px;color:var(--ip-faint);
   text-transform:uppercase;letter-spacing:.05em}
-#infra-page .ip-mv{font-family:var(--ip-mono);font-size:1rem;font-weight:600}
-#infra-page .ip-cloud{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:13px}
-#infra-page .ip-big{font-family:var(--ip-mono);font-size:1.6rem;font-weight:600}
-#infra-page .ip-big small{font-size:.78rem;color:var(--ip-faint)}
-#infra-page .ip-note{margin-top:20px;font-family:var(--ip-mono);font-size:.72rem;color:var(--ip-faint);
-  border:1px dashed var(--ip-line);border-radius:8px;padding:9px 12px}
+#infra-page .ip-mv{font-family:var(--ip-mono);font-size:17px;font-weight:600;margin-top:2px}
+#infra-page .ip-cloud{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+#infra-page .ip-big{font-family:var(--ip-mono);font-size:28px;font-weight:600}
+#infra-page .ip-big small{font-size:14px;color:var(--ip-faint)}
+#infra-page .ip-note{margin-top:24px;font-family:var(--ip-mono);font-size:12px;color:var(--ip-faint);
+  border:1px dashed var(--ip-line);border-radius:8px;padding:11px 14px}
 </style>
 
 <div id="infra-page">
@@ -172,7 +179,7 @@ body.colorscheme-light #infra-page{
     $("ip-platform-count").textContent=(d.platform||[]).length+" services";
     $("ip-cloud").innerHTML=(d.cloud||[]).map(function(x){return '<div class="ip-card '+esc(x.st||'ok')+'">'+
       '<div class="ip-role">'+esc(x.name)+'</div><div class="ip-big tnum">'+esc(x.big)+' <small>'+esc(x.unit)+'</small></div>'+
-      '<div class="ip-role" style="margin-top:2px">'+esc(x.sub||'')+'</div></div>'}).join('');
+      '<div class="ip-role" style="margin-top:3px">'+esc(x.sub||'')+'</div></div>'}).join('');
   }
   function offline(){$("ip-dot").className="ip-dot off";$("ip-ago").textContent="offline";
     $("ip-note").textContent="Status endpoint unreachable — the snapshot service may be starting up. Retrying…";}
