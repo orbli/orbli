@@ -1,0 +1,187 @@
+{{ define "title" }}Infrastructure · {{ .Site.Title }}{{ end }}
+{{ define "content" }}
+{{ $src := .Site.Params.infraStatusURL | default "https://infra-lab.orbb.li/infra.json" }}
+<style>
+#infra-page{
+  --ip-accent:#35d0c0; --ip-ink:#e6edf3; --ip-dim:#9fb0c0; --ip-faint:#6b7d8f;
+  --ip-panel:#111721; --ip-panel2:#0e141d; --ip-line:#1e2733;
+  --ip-ok:#3fb950; --ip-warn:#d29922; --ip-crit:#f85149;
+  --ip-mono:ui-monospace,"Cascadia Code","JetBrains Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+body.colorscheme-light #infra-page{
+  --ip-accent:#0f8f81; --ip-ink:#0d1926; --ip-dim:#3f5567; --ip-faint:#748899;
+  --ip-panel:#ffffff; --ip-panel2:#eef2f6; --ip-line:#dce4ec;
+  --ip-ok:#1a7f37; --ip-warn:#9a6700; --ip-crit:#cf222e;
+}
+#infra-page{color:var(--ip-ink);font-feature-settings:"tnum";line-height:1.5}
+#infra-page .mono{font-family:var(--ip-mono)}
+#infra-page .tnum{font-variant-numeric:tabular-nums}
+#infra-page a{color:var(--ip-accent)}
+
+#infra-page .ip-top{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--ip-line)}
+#infra-page .ip-brand{font-family:var(--ip-mono);font-size:.85rem;color:var(--ip-dim)}
+#infra-page .ip-brand b{color:var(--ip-ink)}
+#infra-page .ip-updated{font-family:var(--ip-mono);font-size:.76rem;color:var(--ip-faint);
+  display:flex;align-items:center;gap:8px}
+#infra-page .ip-dot{width:8px;height:8px;border-radius:50%;background:var(--ip-faint)}
+#infra-page .ip-dot.on{background:var(--ip-ok)}
+#infra-page .ip-dot.off{background:var(--ip-crit)}
+
+#infra-page .ip-eyebrow{font-family:var(--ip-mono);font-size:.72rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ip-accent);margin:34px 0 12px}
+#infra-page h1.ip-h1{font-size:clamp(1.7rem,4.5vw,2.6rem);line-height:1.08;margin:0;
+  letter-spacing:-.02em;text-wrap:balance;max-width:18ch;border:0;padding:0}
+#infra-page h1.ip-h1 em{font-style:normal;color:var(--ip-accent)}
+#infra-page .ip-lede{color:var(--ip-dim);max-width:60ch;margin:16px 0 0}
+
+#infra-page .ip-flag{margin-top:26px;border:1px solid var(--ip-line);border-radius:14px;
+  background:linear-gradient(180deg,var(--ip-panel),var(--ip-panel2));overflow:hidden}
+#infra-page .ip-flag-grid{display:grid;grid-template-columns:1.4fr 1fr}
+@media(max-width:640px){#infra-page .ip-flag-grid{grid-template-columns:1fr}}
+#infra-page .ip-flag-main{padding:22px 24px;border-right:1px solid var(--ip-line)}
+@media(max-width:640px){#infra-page .ip-flag-main{border-right:0;border-bottom:1px solid var(--ip-line)}}
+#infra-page .ip-model{font-family:var(--ip-mono);font-size:1.35rem;font-weight:600}
+#infra-page .ip-apis{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+#infra-page .ip-chip{font-family:var(--ip-mono);font-size:.7rem;padding:4px 9px;border-radius:100px;
+  border:1px solid var(--ip-line);color:var(--ip-dim);background:var(--ip-panel2)}
+#infra-page .ip-chip.on{color:var(--ip-accent);border-color:color-mix(in srgb,var(--ip-accent) 45%,var(--ip-line))}
+#infra-page .ip-flag-note{color:var(--ip-dim);font-size:.9rem;margin:12px 0 0;max-width:46ch}
+#infra-page .ip-flag-side{padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:18px 22px;align-content:center}
+#infra-page .ip-k{font-family:var(--ip-mono);font-size:.68rem;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ip-faint)}
+#infra-page .ip-v{font-family:var(--ip-mono);font-size:1.35rem;font-weight:600;line-height:1.2}
+#infra-page .ip-v small{font-size:.78rem;color:var(--ip-faint);font-weight:400}
+#infra-page .ip-gauge{height:6px;border-radius:100px;background:var(--ip-panel2);
+  border:1px solid var(--ip-line);overflow:hidden;margin-top:7px}
+#infra-page .ip-gauge>i{display:block;height:100%;background:var(--ip-accent)}
+
+#infra-page .ip-sec{margin-top:40px}
+#infra-page .ip-sec-h{display:flex;align-items:baseline;gap:12px;margin:0 0 16px}
+#infra-page .ip-sec-h h2{font-family:var(--ip-mono);font-size:.78rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ip-dim);margin:0;border:0;padding:0;font-weight:600}
+#infra-page .ip-sec-h .ip-rule{flex:1;height:1px;background:var(--ip-line)}
+#infra-page .ip-sec-h .ip-count{font-family:var(--ip-mono);font-size:.74rem;color:var(--ip-faint)}
+
+#infra-page .ip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:13px}
+#infra-page .ip-card{background:var(--ip-panel);border:1px solid var(--ip-line);border-radius:10px;
+  padding:15px 16px;position:relative;overflow:hidden}
+#infra-page .ip-card::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--ip-stripe,var(--ip-faint))}
+#infra-page .ip-card.ok{--ip-stripe:var(--ip-ok)}
+#infra-page .ip-card.warn{--ip-stripe:var(--ip-warn)}
+#infra-page .ip-card.crit{--ip-stripe:var(--ip-crit)}
+#infra-page .ip-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#infra-page .ip-name{font-family:var(--ip-mono);font-weight:600;font-size:.94rem}
+#infra-page .ip-role{font-family:var(--ip-mono);font-size:.7rem;color:var(--ip-faint);margin-top:2px}
+#infra-page .ip-pill{font-family:var(--ip-mono);font-size:.66rem;padding:3px 8px;border-radius:100px;
+  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+#infra-page .ip-pill.ok{color:var(--ip-ok);background:color-mix(in srgb,var(--ip-ok) 14%,transparent)}
+#infra-page .ip-pill.warn{color:var(--ip-warn);background:color-mix(in srgb,var(--ip-warn) 16%,transparent)}
+#infra-page .ip-metrics{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
+#infra-page .ip-mk{font-family:var(--ip-mono);font-size:.66rem;color:var(--ip-faint);
+  text-transform:uppercase;letter-spacing:.05em}
+#infra-page .ip-mv{font-family:var(--ip-mono);font-size:1rem;font-weight:600}
+#infra-page .ip-cloud{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:13px}
+#infra-page .ip-big{font-family:var(--ip-mono);font-size:1.6rem;font-weight:600}
+#infra-page .ip-big small{font-size:.78rem;color:var(--ip-faint)}
+#infra-page .ip-note{margin-top:20px;font-family:var(--ip-mono);font-size:.72rem;color:var(--ip-faint);
+  border:1px dashed var(--ip-line);border-radius:8px;padding:9px 12px}
+</style>
+
+<div id="infra-page">
+  <div class="ip-top">
+    <div class="ip-brand"><b>orbb.li</b> / infra</div>
+    <div class="ip-updated"><span class="ip-dot" id="ip-dot"></span><span id="ip-ago">connecting…</span></div>
+  </div>
+
+  <p class="ip-eyebrow">Self-hosted compute</p>
+  <h1 class="ip-h1" id="ip-headline">A frontier LLM, running under my desk.</h1>
+  <p class="ip-lede">Everything below runs on hardware I own — a Raspberry-Pi Kubernetes cluster, a
+    Nomad cluster, and two NVIDIA GB10 boxes pooling their memory to serve a large language model.
+    GitOps-managed, watched by its own Grafana stack, published outbound-only so nothing here is reachable directly.</p>
+
+  <div class="ip-flag">
+    <div class="ip-flag-grid">
+      <div class="ip-flag-main">
+        <div class="ip-model" id="ip-model">—</div>
+        <div class="ip-apis" id="ip-apis"></div>
+        <p class="ip-flag-note" id="ip-flag-note">Tensor-split across two GB10 nodes over a 200GbE link. Drives Claude Code as a local harness.</p>
+      </div>
+      <div class="ip-flag-side" id="ip-flag-side"></div>
+    </div>
+  </div>
+
+  <div class="ip-sec">
+    <div class="ip-sec-h"><h2>Nodes</h2><span class="ip-rule"></span><span class="ip-count" id="ip-nodes-count"></span></div>
+    <div class="ip-grid" id="ip-nodes"></div>
+  </div>
+  <div class="ip-sec">
+    <div class="ip-sec-h"><h2>Platform</h2><span class="ip-rule"></span><span class="ip-count" id="ip-platform-count"></span></div>
+    <div class="ip-grid" id="ip-platform"></div>
+  </div>
+  <div class="ip-sec">
+    <div class="ip-sec-h"><h2>Hybrid cloud</h2><span class="ip-rule"></span><span class="ip-count">homelab + cloud</span></div>
+    <div class="ip-cloud" id="ip-cloud"></div>
+  </div>
+
+  <div class="ip-note" id="ip-note">Live snapshot, sanitized — no addresses or internal hostnames. Served outbound-only through a Cloudflare tunnel.</div>
+</div>
+
+<script>
+(function(){
+  var SRC = {{ $src | jsonify }};
+  var $=function(id){return document.getElementById(id)};
+  function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+  function metricsHTML(ms){return '<div class="ip-metrics">'+(ms||[]).map(function(m){
+    return '<div><div class="ip-mk">'+esc(m[0])+'</div><div class="ip-mv tnum">'+esc(m[1])+'</div></div>';}).join('')+'</div>'}
+  function card(n){return '<div class="ip-card '+esc(n.status||'ok')+'"><div class="ip-card-top"><div>'+
+    '<div class="ip-name">'+esc(n.name)+'</div><div class="ip-role">'+esc(n.role||'')+'</div></div>'+
+    '<span class="ip-pill '+esc(n.status||'ok')+'">'+esc(n.pill||'')+'</span></div>'+metricsHTML(n.metrics)+'</div>'}
+
+  function agoText(iso){
+    if(!iso) return "no data";
+    var s=Math.max(0,Math.floor((Date.now()-Date.parse(iso))/1000));
+    return s<90? s+"s ago" : Math.floor(s/60)+"m ago";
+  }
+  var lastGen=null;
+
+  function render(d){
+    lastGen=d.generated;
+    $("ip-dot").className="ip-dot on"; tick();
+    var c=d.compute||{};
+    if(c.model){
+      $("ip-model").textContent=c.model;
+      if(c.params_b) $("ip-headline").innerHTML='A <em>'+Math.round(c.params_b)+'-billion-parameter</em> model, running under my desk.';
+    }
+    $("ip-apis").innerHTML=(c.apis||[]).map(function(a){return '<span class="ip-chip on">'+esc(a)+'-compatible</span>'}).join('')+
+      (c.ctx? '<span class="ip-chip">'+Math.round(c.ctx/1024)+'k context</span>':'');
+    var side=[];
+    side.push(['Params', c.params_b? c.params_b+' <small>B</small>':'—']);
+    side.push(['Throughput', c.tok_s!=null? c.tok_s+' <small>tok/s</small>':'<small>awaiting restart</small>']);
+    if(c.kv_cache_pct!=null) side.push(['KV cache', c.kv_cache_pct+' <small>%</small>']);
+    side.push(['Status', c.up? '<span style="color:var(--ip-ok)">online</span>':'<span style="color:var(--ip-crit)">offline</span>']);
+    var sideHTML=side.map(function(s){return '<div><div class="ip-k">'+s[0]+'</div><div class="ip-v tnum">'+s[1]+'</div></div>'}).join('');
+    if(c.vram_gb) sideHTML+='<div style="grid-column:1/-1"><div class="ip-k">VRAM pool</div>'+
+      '<div class="ip-v tnum">'+c.vram_gb+' <small>/ 218 GB</small></div>'+
+      '<div class="ip-gauge"><i style="width:'+Math.min(100,Math.round(c.vram_gb/218*100))+'%"></i></div></div>';
+    $("ip-flag-side").innerHTML=sideHTML;
+
+    $("ip-nodes").innerHTML=(d.nodes||[]).map(card).join('');
+    $("ip-platform").innerHTML=(d.platform||[]).map(card).join('');
+    $("ip-nodes-count").textContent=(d.nodes||[]).length+" tracked";
+    $("ip-platform-count").textContent=(d.platform||[]).length+" services";
+    $("ip-cloud").innerHTML=(d.cloud||[]).map(function(x){return '<div class="ip-card '+esc(x.st||'ok')+'">'+
+      '<div class="ip-role">'+esc(x.name)+'</div><div class="ip-big tnum">'+esc(x.big)+' <small>'+esc(x.unit)+'</small></div>'+
+      '<div class="ip-role" style="margin-top:2px">'+esc(x.sub||'')+'</div></div>'}).join('');
+  }
+  function offline(){$("ip-dot").className="ip-dot off";$("ip-ago").textContent="offline";
+    $("ip-note").textContent="Status endpoint unreachable — the snapshot service may be starting up. Retrying…";}
+  function tick(){$("ip-ago").textContent=agoText(lastGen)}
+
+  function load(){
+    fetch(SRC,{cache:"no-store"}).then(function(r){return r.json()}).then(render).catch(offline);
+  }
+  load(); setInterval(load, 30000); setInterval(tick, 1000);
+})();
+</script>
+{{ end }}

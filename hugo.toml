@@ -29,6 +29,9 @@ hideColorSchemeToggle = false
 maxSeeAlsoItems = 5
 commit = "https://github.com/luizdepra/hugo-coder/tree/"
 
+# Public (sanitized) live-status endpoint, served outbound-only via the cloudflared tunnel.
+infraStatusURL = "https://infra-lab.orbb.li/infra.json"
+
 customCSS = []
 customSCSS = []
 customJS = []
@@ -85,4 +88,9 @@ url = "blog/"
 name = "Projects"
 weight = 3
 url = "projects/"
+
+[[languages.en.menu.main]]
+name = "Infra"
+weight = 4
+url = "infra/"
 
