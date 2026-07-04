@@ -73,6 +73,8 @@ body.colorscheme-light #infra-page{
 #infra-page .ip-mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:15px 20px}
 #infra-page .ip-cell .ip-mk{font-family:var(--ip-mono);font-size:11px;color:var(--ip-faint);text-transform:uppercase;letter-spacing:.05em}
 #infra-page .ip-cell .ip-mv{font-family:var(--ip-mono);font-size:18px;font-weight:600;margin-top:3px;white-space:nowrap}
+#infra-page .ip-spark{display:block;width:100%;max-width:66px;height:13px;margin-top:5px;color:var(--ip-accent);opacity:.8}
+#infra-page .ip-gpu .ip-spark{max-width:none;height:16px;margin-top:10px}
 
 /* gpu sub-blocks */
 #infra-page .ip-gpus{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
@@ -168,9 +170,29 @@ body.colorscheme-light #infra-page{
   var PREV={};
   function fc(key,v){var s=String(v);var c=(PREV[key]!==undefined&&PREV[key]!==s)?" ip-flash":"";PREV[key]=s;return c}
 
+  // rolling-history sparklines (client-side; the SSE stream is already 1 Hz)
+  var HIST={}, MAXN=60;
+  var SPARKABLE={"cpu":1,"mem":1,"load":1,"temp":1,"freq":1,"fan":1,"disk ↓":1,"disk ↑":1,"net ↓":1,"net ↑":1};
+  function parseNum(s){ // -> a comparable number (units normalized to a base)
+    if(s==null)return null; var m=String(s).match(/(-?[\d.]+)\s*(%|°C|MHz|rpm|GB\/s|MB\/s|KB\/s|B\/s|W)?/);
+    if(!m)return null; var n=parseFloat(m[1]); if(isNaN(n))return null;
+    var mul={"B/s":1,"KB/s":1024,"MB/s":1048576,"GB/s":1073741824}[m[2]];
+    return mul?n*mul:n;
+  }
+  function push(key,n){ if(n==null||isNaN(n))return HIST[key]||[]; var a=HIST[key]||(HIST[key]=[]); a.push(n); if(a.length>MAXN)a.shift(); return a; }
+  function spark(a){
+    if(!a||a.length<2)return"";
+    var w=64,h=13,mn=Math.min.apply(null,a),mx=Math.max.apply(null,a),rng=(mx-mn)||1;
+    var d=a.map(function(v,i){return (i?"L":"M")+((i/(a.length-1))*w).toFixed(1)+" "+((h-1)-((v-mn)/rng)*(h-2)).toFixed(1)}).join(" ");
+    return '<svg class="ip-spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true">'+
+      '<path d="'+d+'" fill="none" stroke="currentColor" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>';
+  }
+
   function mgrid(name,ms){return '<div class="ip-mgrid">'+(ms||[]).map(function(m){
+    var key=name+'|'+m[0], sp='';
+    if(SPARKABLE[m[0]]) sp=spark(push(key,parseNum(m[1])));
     return '<div class="ip-cell"><div class="ip-mk">'+esc(m[0])+'</div>'+
-      '<div class="ip-cell-v ip-mv tnum'+fc(name+'|'+m[0],m[1])+'">'+esc(m[1])+'</div></div>';}).join('')+'</div>'}
+      '<div class="ip-cell-v ip-mv tnum'+fc(key,m[1])+'">'+esc(m[1])+'</div>'+sp+'</div>';}).join('')+'</div>'}
 
   function panel(n){
     var stripe=n.status==='warn'?'var(--ip-warn)':n.status==='crit'?'var(--ip-crit)':'var(--ip-ok)';
@@ -184,7 +206,8 @@ body.colorscheme-light #infra-page{
           '<div class="ip-bar"><i style="width:'+Math.max(2,g.util)+'%"></i></div>'+
           '<div class="ip-gpu-sub"><span class="tnum'+fc(k+'u',g.util)+'">util '+g.util+'%</span>'+
           '<span class="tnum'+fc(k+'m',g.mhz)+'">'+g.mhz+' MHz</span>'+
-          '<span class="tnum'+fc(k+'p',g.power)+'">'+g.power+' W</span></div></div>';}).join('')+'</div>';
+          '<span class="tnum'+fc(k+'p',g.power)+'">'+g.power+' W</span></div>'+
+          spark(push(k+'temph',g.temp))+'</div>';}).join('')+'</div>';
     }
     return h+mgrid(n.name,n.metrics)+'</div>';
   }
