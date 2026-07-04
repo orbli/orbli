@@ -207,6 +207,9 @@ body.colorscheme-light #infra-page{
           '<div class="ip-gpu-sub"><span class="tnum'+fc(k+'u',g.util)+'">util '+g.util+'%</span>'+
           '<span class="tnum'+fc(k+'m',g.mhz)+'">'+g.mhz+' MHz</span>'+
           '<span class="tnum'+fc(k+'p',g.power)+'">'+g.power+' W</span></div>'+
+          (g.memtot? '<div class="ip-gpu-sub" style="margin-top:9px"><span>mem</span>'+
+            '<span class="tnum'+fc(k+'mem',g.mem)+'">'+g.mem+' / '+g.memtot+' GB</span></div>'+
+            '<div class="ip-bar" style="margin-top:6px"><i style="width:'+Math.min(100,Math.round(g.mem/(g.memtot||1)*100))+'%"></i></div>':'')+
           spark(push(k+'temph',g.temp))+'</div>';}).join('')+'</div>';
     }
     return h+mgrid(n.name,n.metrics)+'</div>';
