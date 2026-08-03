@@ -2,6 +2,7 @@
 date = '2025-02-14T07:22:41+08:00'
 author = 'Orb Li'
 title = "Resume"
+aliases = ['/about/']
 +++
 
 # Working Experience
@@ -52,24 +53,3 @@ Tenor: 2015 Jan - 2016 Dec
 - Observe the network traffic with _Wireshark_ and in-house product for debugging
 - Establish automated test in Windows Server mimicing Eikon connected to Elektron
 - Knowledge in _RSSL_ and therefore market data handling
-
----
-
-# Academic Experience
-
-## MSc Computer Science, University of Hong Kong
-
-Tenor: 2015 Sep - 2018 Dec
-- Disseration studying structure of security proofs
-- Include courses with basic financial knowledge
-- Include courses with basic data mining and machine learning knowledge
-
-Keywords: #zeroknowledgeproof #binomialoptionpricing #datamining #markovchain
-
-## BSc Maths, University of Hong Kong
-
-Tenor: 2011 Sep - 2014 Aug
-- Received programming training in SciLab, C++, Java
-- Received basic training in several foundational area in Mathematics
-
-Keywords: #ode #numericalanalysis #numbertheory #oop

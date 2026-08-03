@@ -20,7 +20,16 @@ unsafe = true
 author = "Orb Li"
 description = "Orb Li's personal website"
 keywords = "blog,developer,personal"
-info = ["Software Engineer", "Amateur Classical Music Improviser", "Selfhoster"]
+info = [
+  "Quantitative Developer",
+  "Selfhoster",
+  "Student Pilot",
+  "Aspiring Solicitor",
+  "Amateur Pianist & Aspiring Composer",
+  "Trainee Piano Tuner",
+  "Hobbyist Laser Machine Operator",
+  "Home Tinkerer",
+]
 gravatar = "mail@orbb.li"
 dateFormat = "January 2, 2006"
 since = 2014
@@ -77,20 +86,25 @@ languageName = ":uk:"
 [[languages.en.menu.main]]
 name = "Resume"
 weight = 1
-url = "about/"
+url = "resume/"
+
+[[languages.en.menu.main]]
+name = "Credentials"
+weight = 2
+url = "credentials/"
 
 [[languages.en.menu.main]]
 name = "Blog"
-weight = 2
+weight = 3
 url = "blog/"
 
 [[languages.en.menu.main]]
 name = "Projects"
-weight = 3
+weight = 4
 url = "projects/"
 
 [[languages.en.menu.main]]
 name = "Infra"
-weight = 4
+weight = 5
 url = "infra/"
 
