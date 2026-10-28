@@ -1,7 +1,8 @@
 +++
 date = '2026-08-04T00:00:00+08:00'
 author = 'Orb Li'
-title = "Credentials"
+title = "Qualifications"
+aliases = ["/credentials/"]
 +++
 
 # Academic Experience
@@ -38,4 +39,4 @@ Passed: 2024 May
 
 ## Grade 8 Music Theory, ABRSM
 
-Passed: 2023 Oct
+Merit: 2023 Oct

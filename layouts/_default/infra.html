@@ -123,9 +123,10 @@ body.colorscheme-light #infra-page{
     <span class="ip-eyebrow">Self-hosted compute</span>
     <span class="ip-updated"><span class="ip-dot" id="ip-dot"></span><span id="ip-ago">connecting…</span></span>
   </div>
-  <h2 class="ip-h1" id="ip-headline">A frontier LLM, running under my desk.</h2>
+  <h2 class="ip-h1" id="ip-headline">An image-editing model, running under my desk.</h2>
   <p class="ip-lede">A hybrid system I designed and run end-to-end — self-hosted where it matters, cloud where it helps.
-    A frontier LLM lives on two NVIDIA GB10 boxes under my desk and a Raspberry-Pi cluster runs the platform,
+    A 20-billion-parameter image-editing model and a 14B video generator live on two NVIDIA GB10 boxes under my desk,
+    a Raspberry-Pi cluster runs the platform,
     while a Nomad federation reaches into cloud VMs across three continents. All GitOps-managed, watched by its own
     Grafana stack, and published outbound-only so nothing here is reachable directly.</p>
 
@@ -134,7 +135,7 @@ body.colorscheme-light #infra-page{
       <div class="ip-flag-main">
         <div class="ip-model" id="ip-model">—</div>
         <div class="ip-apis" id="ip-apis"></div>
-        <p class="ip-flag-note">Tensor-split across two GB10 nodes over a 200GbE link. Drives Claude Code as a local harness.</p>
+        <p class="ip-flag-note">One model per GB10: α renders image edits through headless ComfyUI for a photo-to-line-art laser-engraving pipeline; β generates video clips.</p>
       </div>
       <div class="ip-flag-side" id="ip-flag-side"></div>
     </div>
@@ -229,17 +230,19 @@ body.colorscheme-light #infra-page{
     lastGen=d.generated; $("ip-dot").className="ip-dot on"; tick();
     var c=d.compute||{};
     if(c.model){$("ip-model").textContent=c.model;
-      if(c.params_b)$("ip-headline").innerHTML='A <em>'+Math.round(c.params_b)+'-billion-parameter</em> model, running under my desk.';}
-    $("ip-apis").innerHTML=(c.apis||[]).map(function(a){return '<span class="ip-chip on">'+esc(a)+'-compatible</span>'}).join('')+
-      (c.ctx?'<span class="ip-chip">'+Math.round(c.ctx/1024)+'k context</span>':'');
-    var side=[];
+      if(c.params_b)$("ip-headline").innerHTML='A <em>'+Math.round(c.params_b)+'-billion-parameter</em> '+esc(c.task||'')+' model, running under my desk.';}
+    var chips=(c.apis||[]).map(function(a){return '<span class="ip-chip on">'+esc(a)+'</span>'});
+    if(c.engine)chips.push('<span class="ip-chip">'+esc(c.engine)+'</span>');
+    if(c.second&&c.second.model)chips.push('<span class="ip-chip'+(c.second.up?' on':'')+'">+ '+esc(c.second.model)+' · '+esc(c.second.task)+'</span>');
+    $("ip-apis").innerHTML=chips.join('');
+    var side=[], q=c.queue;
     side.push(['Params',c.params_b?c.params_b+' <small>B</small>':'—']);
-    side.push(['Throughput',c.tok_s!=null?'<span class="'+fc('tok',c.tok_s)+'">'+c.tok_s+' <small>tok/s</small></span>':'<small>awaiting restart</small>']);
-    if(c.kv_cache_pct!=null)side.push(['KV cache',c.kv_cache_pct+' <small>%</small>']);
+    side.push(['Queue',q?((q.running||q.pending)?'<span class="'+fc('q',q.running+q.pending)+'">'+q.running+' <small>running</small> · '+q.pending+' <small>queued</small></span>':'<span style="color:var(--ip-ok)">idle</span>'):'—']);
+    if(c.second)side.push(['Video gen · GPU '+esc(c.second.gpu||'β'),c.second.up?'<span style="color:var(--ip-ok)">online</span> <small>'+esc(c.second.params_b)+'B</small>':'<span style="color:var(--ip-crit)">offline</span>']);
     side.push(['Status',c.up?'<span style="color:var(--ip-ok)">online</span>':'<span style="color:var(--ip-crit)">offline</span>']);
     var sh=side.map(function(s){return '<div><div class="ip-k">'+s[0]+'</div><div class="ip-v tnum">'+s[1]+'</div></div>'}).join('');
-    if(c.vram_gb)sh+='<div style="grid-column:1/-1"><div class="ip-k">VRAM pool</div><div class="ip-v tnum">'+c.vram_gb+
-      ' <small>/ 218 GB</small></div><div class="ip-gauge"><i style="width:'+Math.min(100,Math.round(c.vram_gb/218*100))+'%"></i></div></div>';
+    if(c.mem_gb){var mt=c.memtot_gb||120;sh+='<div style="grid-column:1/-1"><div class="ip-k">Model resident · GPU '+esc(c.gpu||'α')+'</div><div class="ip-v tnum">'+c.mem_gb+
+      ' <small>/ '+mt+' GB</small></div><div class="ip-gauge"><i style="width:'+Math.min(100,Math.round(c.mem_gb/mt*100))+'%"></i></div></div>';}
     $("ip-flag-side").innerHTML=sh;
 
     var nodes=d.nodes||[], bigs=[], cards=[];

@@ -90,9 +90,9 @@ weight = 1
 url = "resume/"
 
 [[languages.en.menu.main]]
-name = "Credentials"
+name = "Qualifications"
 weight = 2
-url = "credentials/"
+url = "qualifications/"
 
 [[languages.en.menu.main]]
 name = "Blog"
